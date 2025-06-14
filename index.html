@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-B" />
+    <title></title>
+  </head>
+  <body onload="fetchContacts()">
+    <div id="table">Contacts loading...</div>
+    <button id="refresh_button" type="button">Refresh</buton>
+    <button id="addContact" type="button">add Contact</button>
+       
+      <script src="config.js"></script>
+
+      <script>
+        //Check if API Key is set
+        document.getElementById("refresh_button").addEventListener("click", fetchContacts);
+        document.getElementById("addContact").addEventListener("click", addContact);
+         
+
+        //Fetch Contacts Function
+        function fetchContacts() {
+          fetch(rootPath + "controller/get-contacts/")//fetches the contacts from the API
+            .then(function (response) { 
+              return response.json();//converts response into a
+            })
+            .then(function (data) {//converts response into a json object
+              displayOutput(data);
+              //console.log(data);
+            });
+        }
+        //Display Output Function
+        function displayOutput(data){
+          output = "<table>";
+
+          for(a in data){
+            output += `<tr onclick="editContact(${data[a].id})">
+                      
+                        <td><img src="${rootPath}controller/uploads/${data[a].avatar}" width="100px"/></td>
+                        <td><h5>${data[a].firstname}</h5></td>
+                        <td><h5>${data[a].lastname}</h5></td>
+                         <td><h5>${data[a].email}</h5></td>
+                        <td><h5>${data[a].phone}</h5></td>
+                        <td><h5>${data[a].address}</h5></td>
+                      </tr>`;
+            
+            
+
+          }
+          output += "</table>";
+          document.getElementById("table").innerHTML = output;
+        }
+
+        //Add Contact Function
+        function addContact() {
+          window.open("add-contact.html", "_self");
+        }
+
+        //Add edit contact function
+        function editContact(id) {
+          window.open("edit-contact.html?id=" + id, "_self");
+        }
+        
+
+      </script>
+      <style>
+        
+        body {
+          font-family: Arial, sans-serif;
+          margin: 25px;
+          padding: auto;
+          background-color: #f4f4f4;
+        }
+        table {
+          
+          border-collapse: collapse;
+          margin: 25px 0;
+          width: 100%;
+          border: px solid black;
+          text-align: left;
+        }
+        tbody tr{
+          border-bottom: 1px solid #dddddd;
+        }
+        tbody tr:nth-of-type(even) {
+          background-color: darkgrey; 
+        }
+        tbody tr:hover {
+          background-color: #f1f1f1;
+        }
+          
+
+        
+      </style>
+  </body>
+</html>
