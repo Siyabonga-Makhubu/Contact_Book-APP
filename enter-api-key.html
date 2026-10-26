@@ -21,7 +21,8 @@
       function setApiKey(e) {
         e.preventDefault();
 
-        apiKey = document.getElementById("apiKey").value;
+       // apiKey = document.getElementById("apiKey").value;
+        apiKey = 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;
         fetch(rootPath + "controller/api-key/?apiKey=" + apiKey)
           .then(function (response) {
             return response.text();
