@@ -1,95 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="UTF-B" />
-    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contact Book</title>
   </head>
-  <body onload="fetchContacts()">
-    <div id="table">Contacts loading...</div>
-    <button id="refresh_button" type="button">Refresh</buton>
-    <button id="addContact" type="button">add Contact</button>
-       
-      <script src="config.js"></script>
+  <body>
+    <h1>Contact Book</h1>
+    <div id="table" role="status">Contacts loading...</div>
+    <button id="refresh_button" type="button">Refresh</button>
+    <button id="addContact" type="button">Add contact</button>
 
-      <script>
-        //Check if API Key is set
-        document.getElementById("refresh_button").addEventListener("click", fetchContacts);
-        document.getElementById("addContact").addEventListener("click", addContact);
-         
+    <script src="config.js"></script>
+    <script>
+      document.getElementById("refresh_button").addEventListener("click", fetchContacts);
+      document.getElementById("addContact").addEventListener("click", () => {
+        window.location.href = "add-contact.html";
+      });
 
-        //Fetch Contacts Function
-        function fetchContacts() {
-          fetch(rootPath + "controller/get-contacts/")//fetches the contacts from the API
-            .then(function (response) { 
-              return response.json();//converts response into a
-            })
-            .then(function (data) {//converts response into a json object
-              displayOutput(data);
-              //console.log(data);
-            });
+      async function fetchContacts() {
+        const container = document.getElementById("table");
+        container.textContent = "Contacts loading...";
+        try {
+          const response = await fetch(apiPath + "contacts");
+          const contacts = await response.json();
+          if (!response.ok) throw new Error(contacts.error || "Could not load contacts.");
+          displayOutput(contacts);
+        } catch (error) {
+          container.textContent = error.message;
         }
-        //Display Output Function
-        function displayOutput(data){
-          output = "<table>";
+      }
 
-          for(a in data){
-            output += `<tr onclick="editContact(${data[a].id})">
-                      
-                        <td><img src="${rootPath}controller/uploads/${data[a].avatar}" width="100px"/></td>
-                        <td><h5>${data[a].firstname}</h5></td>
-                        <td><h5>${data[a].lastname}</h5></td>
-                         <td><h5>${data[a].email}</h5></td>
-                        <td><h5>${data[a].phone}</h5></td>
-                        <td><h5>${data[a].address}</h5></td>
-                      </tr>`;
-            
-            
+      function displayOutput(contacts) {
+        const container = document.getElementById("table");
+        container.replaceChildren();
+        if (!contacts.length) {
+          container.textContent = "No contacts yet. Add one to get started.";
+          return;
+        }
 
+        const table = document.createElement("table");
+        const headings = ["Photo", "First name", "Last name", "Email", "Phone", "Address"];
+        const header = table.createTHead().insertRow();
+        headings.forEach((heading) => {
+          const cell = document.createElement("th");
+          cell.scope = "col";
+          cell.textContent = heading;
+          header.appendChild(cell);
+        });
+
+        const body = table.createTBody();
+        contacts.forEach((contact) => {
+          const row = body.insertRow();
+          row.tabIndex = 0;
+          row.setAttribute("role", "link");
+          row.addEventListener("click", () => {
+            window.location.href = `edit-contact.html?id=${encodeURIComponent(contact.id)}`;
+          });
+          row.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") row.click();
+          });
+          const photo = row.insertCell();
+          if (contact.avatar) {
+            const image = document.createElement("img");
+            image.src = uploadsPath + encodeURIComponent(contact.avatar);
+            image.alt = `${contact.firstname} ${contact.lastname}`;
+            image.width = 64;
+            image.height = 64;
+            photo.appendChild(image);
           }
-          output += "</table>";
-          document.getElementById("table").innerHTML = output;
-        }
+          [contact.firstname, contact.lastname, contact.email, contact.phone, contact.address]
+            .forEach((value) => {
+              row.insertCell().textContent = value;
+            });
+        });
+        container.appendChild(table);
+      }
 
-        //Add Contact Function
-        function addContact() {
-          window.open("add-contact.html", "_self");
-        }
-
-        //Add edit contact function
-        function editContact(id) {
-          window.open("edit-contact.html?id=" + id, "_self");
-        }
-        
-
-      </script>
-      <style>
-        
-        body {
-          font-family: Arial, sans-serif;
-          margin: 25px;
-          padding: auto;
-          background-color: #f4f4f4;
-        }
-        table {
-          
-          border-collapse: collapse;
-          margin: 25px 0;
-          width: 100%;
-          border: px solid black;
-          text-align: left;
-        }
-        tbody tr{
-          border-bottom: 1px solid #dddddd;
-        }
-        tbody tr:nth-of-type(even) {
-          background-color: darkgrey; 
-        }
-        tbody tr:hover {
-          background-color: #f1f1f1;
-        }
-          
-
-        
-      </style>
+      fetchContacts();
+    </script>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 25px; background: #f4f4f4; }
+      table { width: 100%; margin: 25px 0; border-collapse: collapse; text-align: left; }
+      th, td { padding: 8px; border-bottom: 1px solid #ccc; }
+      tbody tr { cursor: pointer; }
+      tbody tr:nth-child(even) { background: #e7e7e7; }
+      tbody tr:hover, tbody tr:focus { background: #d7e8f7; }
+    </style>
   </body>
 </html>

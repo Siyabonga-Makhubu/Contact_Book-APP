@@ -1,1 +1,5 @@
 node_modules/
+contact_book.sqlite3
+contact_book.sqlite3-shm
+contact_book.sqlite3-wal
+uploads/
