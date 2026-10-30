@@ -1,2 +1,6 @@
-# The Python API uses only the Python standard library.
-Flask>=3.0,<4.0
+Flask
+Werkzeug
+Flask-CORS
+Flask-Login
+Flask-WTF
+SQLAlchemy
